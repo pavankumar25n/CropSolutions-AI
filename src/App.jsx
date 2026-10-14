@@ -1,99 +1,26 @@
 import { useMemo, useState } from "react";
-const seed = [
-  {
-    id: 1,
-    name: "Demo: Kavita Patil",
-    village: "Deola",
-    crop: "Onion",
-    qty: 1200,
-    price: 18,
-    date: "2026-10-21",
-  },
-  {
-    id: 2,
-    name: "Demo: Ramesh Jadhav",
-    village: "Deola",
-    crop: "Onion",
-    qty: 850,
-    price: 17,
-    date: "2026-10-22",
-  },
-  {
-    id: 3,
-    name: "Demo: Suresh Pawar",
-    village: "Malegaon",
-    crop: "Onion",
-    qty: 700,
-    price: 18,
-    date: "2026-10-24",
-  },
-  {
-    id: 4,
-    name: "Demo: Asha Shinde",
-    village: "Niphad",
-    crop: "Tomato",
-    qty: 640,
-    price: 22,
-    date: "2026-10-20",
-  },
-  {
-    id: 5,
-    name: "Demo: Ganesh More",
-    village: "Deola",
-    crop: "Onion",
-    qty: 950,
-    price: 19,
-    date: "2026-10-25",
-  },
-];
-const buyers = [
-    {
-      id: "demo-1",
-      demo: true,
-      name: "Nashik Fresh Produce Co-op",
-      crop: "Onion",
-      qty: 2000,
-      region: "Nashik region",
-      price: 21,
-    },
-    {
-      id: "demo-2",
-      demo: true,
-      name: "GreenBasket Wholesale",
-      crop: "Onion",
-      qty: 3000,
-      region: "Nashik region",
-      price: 20,
-    },
-    {
-      id: "demo-3",
-      demo: true,
-      name: "Sahyadri Foods",
-      crop: "Tomato",
-      qty: 500,
-      region: "Pune region",
-      price: 25,
-    },
-    {
-      id: "demo-4",
-      demo: true,
-      name: "Vidarbha Market Link",
-      crop: "Onion",
-      qty: 1500,
-      region: "Nagpur region",
-      price: 19,
-    },
-  ],
-  nav = [
+import {
+  calculateEarnings,
+  DEMO_BUYERS,
+  DEMO_HARVESTS,
+  groupHarvests,
+  matchBuyers,
+  readLocalArray,
+  validateBuyerRequest,
+  validateHarvestEntry,
+  writeLocalArray,
+} from "./domain.js";
+
+const nav = [
     ["home", "⌂", "Overview"],
     ["harvests", "▦", "Harvests"],
     ["matching", "⤳", "Matching"],
     ["buyers", "♙", "Buyer requests"],
     ["earnings", "₹", "Earnings"],
     ["assistant", "✳", "Assistant"],
-  ],
-  fmt = (n) => Math.round(+n || 0).toLocaleString("en-IN"),
-  rs = (n) => "₹" + fmt(n);
+  ];
+const fmt = (n) => Math.round(+n || 0).toLocaleString("en-IN");
+const rs = (n) => "₹" + fmt(n);
 function Table({ rows, remove }) {
   return (
     <div className="scroll">
@@ -146,62 +73,45 @@ function Table({ rows, remove }) {
   );
 }
 export default function App() {
-  const [page, P] = useState("home"),
-    [rows, R] = useState(() => {
-      try {
-        return JSON.parse(localStorage.getItem("cs-harvests")) || seed;
-      } catch {
-        return seed;
-      }
-    }),
-    [buyerRequests, BR] = useState(() => {
-      try {
-        return JSON.parse(localStorage.getItem("cs-buyer-requests")) || [];
-      } catch {
-        return [];
-      }
-    }),
-    [msg, M] = useState(""),
-    [formError, FE] = useState(""),
-    [crop, C] = useState("Onion"),
-    [target, T] = useState(2500),
-    [region, G] = useState("Nashik region"),
-    [calc, Q] = useState({ qty: 2500, price: 18, transport: 4200, other: 800 }),
-    [question, U] = useState(""),
-    [answer, A] = useState("");
+  const [page, setPage] = useState("home"),
+    [rows, setHarvests] = useState(() =>
+      readLocalArray("cs-harvests", DEMO_HARVESTS),
+    ),
+    [buyerRequests, setBuyerRequests] = useState(() =>
+      readLocalArray("cs-buyer-requests", []),
+    ),
+    [msg, setMessage] = useState(""),
+    [formError, setFormError] = useState(""),
+    [crop, setCrop] = useState("Onion"),
+    [target, setTarget] = useState(2500),
+    [region, setRegion] = useState("Nashik region"),
+    [calc, setCalculator] = useState({ qty: 2500, price: 18, transport: 4200, other: 800 }),
+    [question, setQuestion] = useState(""),
+    [answer, setAnswer] = useState("");
   const crops = [...new Set(rows.map((x) => x.crop))],
     total = rows.reduce((s, x) => s + x.qty, 0),
     grossRows = rows.reduce((s, x) => s + x.qty * x.price, 0),
-    pool = useMemo(() => {
-      let list = [],
-        qty = 0;
-      for (const x of rows
-        .filter((x) => x.crop.toLowerCase() === crop.toLowerCase())
-        .sort((a, b) => b.qty - a.qty)) {
-        if (qty >= target) break;
-        list.push(x);
-        qty += x.qty;
-      }
-      return { list, qty };
-    }, [rows, crop, target]),
-    buyerList = [...buyers, ...buyerRequests],
-    matches = buyerList.filter(
-      (b) =>
-        b.crop.toLowerCase() === crop.toLowerCase() &&
-        b.qty <= pool.qty &&
-        (region === "All regions" || b.region === region),
+    pool = useMemo(() => groupHarvests(rows, crop, target), [rows, crop, target]),
+    buyerList = useMemo(
+      () => [...DEMO_BUYERS, ...buyerRequests],
+      [buyerRequests],
     ),
-    gross = calc.qty * calc.price,
-    net = gross - calc.transport - calc.other;
+    matches = useMemo(
+      () => matchBuyers(buyerList, crop, pool.qty, region),
+      [buyerList, crop, pool.qty, region],
+    ),
+    earnings = useMemo(() => calculateEarnings(calc), [calc]),
+    gross = earnings.gross,
+    net = earnings.net;
   const go = (p) => {
-      P(p);
-      M("");
-      FE("");
+      setPage(p);
+      setMessage("");
+      setFormError("");
       window.scrollTo(0, 0);
     },
     save = (e) => {
       e.preventDefault();
-      FE("");
+      setFormError("");
       const d = new FormData(e.currentTarget),
         x = {
           id: Date.now(),
@@ -212,40 +122,31 @@ export default function App() {
           price: +d.get("price"),
           date: d.get("date"),
         };
-      if (
-        !x.name ||
-        !x.village ||
-        !x.crop ||
-        !x.date ||
-        !Number.isFinite(x.qty) ||
-        x.qty < 1 ||
-        !Number.isFinite(x.price) ||
-        x.price < 0
-      ) {
-        FE(
-          "Enter a farmer, village, crop, valid quantity, non-negative price, and harvest date.",
-        );
+      const validationMessage = validateHarvestEntry(x);
+      if (validationMessage) {
+        setFormError(validationMessage);
         return;
       }
       const n = [x, ...rows];
-      R(n);
-      C(x.crop);
-      M("Harvest added to your collective.");
-      try {
-        localStorage.setItem("cs-harvests", JSON.stringify(n));
-      } catch {}
+      setHarvests(n);
+      setCrop(x.crop);
+      setMessage(
+        writeLocalArray("cs-harvests", n)
+          ? "Harvest added to your collective."
+          : "Harvest added for this session, but browser storage is unavailable.",
+      );
       e.currentTarget.reset();
     },
     remove = (id) => {
       let n = rows.filter((x) => x.id !== id);
-      R(n);
-      try {
-        localStorage.setItem("cs-harvests", JSON.stringify(n));
-      } catch {}
+      setHarvests(n);
+      if (!writeLocalArray("cs-harvests", n)) {
+        setMessage("Harvest removed for this session, but browser storage is unavailable.");
+      }
     },
     saveBuyer = (e) => {
       e.preventDefault();
-      FE("");
+      setFormError("");
       const d = new FormData(e.currentTarget),
         b = {
           id: Date.now(),
@@ -256,39 +157,31 @@ export default function App() {
           region: d.get("buyerRegion"),
           price: +d.get("buyerPrice"),
         };
-      if (
-        !b.name ||
-        !b.crop ||
-        !b.region ||
-        !Number.isFinite(b.qty) ||
-        b.qty < 1 ||
-        !Number.isFinite(b.price) ||
-        b.price < 0
-      ) {
-        FE(
-          "Enter a buyer, crop, valid required quantity, region, and non-negative offered price.",
-        );
+      const validationMessage = validateBuyerRequest(b);
+      if (validationMessage) {
+        setFormError(validationMessage);
         return;
       }
       const n = [b, ...buyerRequests];
-      BR(n);
-      try {
-        localStorage.setItem("cs-buyer-requests", JSON.stringify(n));
-      } catch {}
-      M("Buyer request saved in this browser and added to matching.");
+      setBuyerRequests(n);
+      setMessage(
+        writeLocalArray("cs-buyer-requests", n)
+          ? "Buyer request saved in this browser and added to matching."
+          : "Buyer request added for this session, but browser storage is unavailable.",
+      );
       e.currentTarget.reset();
     },
     removeBuyer = (id) => {
       const n = buyerRequests.filter((b) => b.id !== id);
-      BR(n);
-      try {
-        localStorage.setItem("cs-buyer-requests", JSON.stringify(n));
-      } catch {}
+      setBuyerRequests(n);
+      if (!writeLocalArray("cs-buyer-requests", n)) {
+        setMessage("Buyer request removed for this session, but browser storage is unavailable.");
+      }
     },
     ask = (e) => {
       e.preventDefault();
       if (question.trim())
-        A(
+        setAnswer(
           "Fallback explanation (AI API not configured): Your " +
             crop +
             " pool has " +
@@ -360,7 +253,7 @@ export default function App() {
           {msg && (
             <div className="notice" role="status" aria-live="polite">
               {msg}
-              <button onClick={() => M("")}>×</button>
+              <button onClick={() => setMessage("")}>×</button>
             </div>
           )}
           {page === "home" && (
@@ -377,8 +270,10 @@ export default function App() {
                   <em>Stronger Communities.</em>
                 </h1>
                 <p>
-                  Bring your harvest together, reach better markets, and make
-                  every kilogram count.
+                  Small farmers often harvest limited quantities individually,
+                  making bulk sales difficult and transport costly. CropSolution
+                  AI helps groups combine compatible harvests, compare
+                  potential buyer needs, and estimate earnings.
                 </p>
                 <button className="light" onClick={() => go("harvests")}>
                   ＋ Add a harvest
@@ -386,6 +281,35 @@ export default function App() {
                 <button className="herolink" onClick={() => go("matching")}>
                   Explore collective matching →
                 </button>
+              </section>
+              <section className="workflow" aria-labelledby="workflow-title">
+                <div className="workflow-heading">
+                  <small className="eyebrow">A CLEAR PATH FROM HARVEST TO SALE</small>
+                  <h2 id="workflow-title">How the collective workflow works</h2>
+                  <p>
+                    Pooling can help meet bulk quantity requirements. Buyer
+                    listings are potential matches only; confirm details and
+                    transport arrangements directly.
+                  </p>
+                </div>
+                <div className="workflow-steps">
+                  {[
+                    ["01", "Add harvest", "Record crop, quantity, and village.", "harvests"],
+                    ["02", "Group compatible crops", "Combine the same crop toward a target.", "matching"],
+                    ["03", "Review potential buyers", "Compare crop, quantity, and region.", "matching"],
+                    ["04", "Estimate earnings", "Subtract transport and other costs.", "earnings"],
+                  ].map(([number, title, description, destination]) => (
+                    <button
+                      className="workflow-step"
+                      key={number}
+                      onClick={() => go(destination)}
+                    >
+                      <span>{number}</span>
+                      <b>{title}</b>
+                      <small>{description}</small>
+                    </button>
+                  ))}
+                </div>
               </section>
               <small className="eyebrow">YOUR COLLECTIVE AT A GLANCE</small>
               <div className="title">
@@ -465,7 +389,7 @@ export default function App() {
                   <button
                     className="outline"
                     onClick={() => {
-                      C(
+                      setCrop(
                         crops.includes("Onion") ? "Onion" : crops[0] || "Onion",
                       );
                       go("matching");
@@ -494,7 +418,7 @@ export default function App() {
                   <p>Share a crop contribution with your collective.</p>
                   <form
                     onSubmit={save}
-                    onChange={() => FE("")}
+                    onChange={() => setFormError("")}
                     aria-labelledby="harvest-form-title"
                     aria-describedby={formError ? "form-error" : undefined}
                   >
@@ -528,14 +452,14 @@ export default function App() {
                         placeholder="e.g. Onion"
                         list="crop-suggest"
                       />
-                      <datalist id="crop-suggest">
-                        <option>Onion</option>
-                        <option>Tomato</option>
-                        <option>Wheat</option>
-                        <option>Potato</option>
-                        <option>Grapes</option>
-                      </datalist>
                     </label>
+                    <datalist id="crop-suggest">
+                      <option>Onion</option>
+                      <option>Tomato</option>
+                      <option>Wheat</option>
+                      <option>Potato</option>
+                      <option>Grapes</option>
+                    </datalist>
                     <div className="formrow">
                       <label htmlFor="harvest-quantity">
                         Quantity (kg)
@@ -614,7 +538,7 @@ export default function App() {
                   <p>New requests can appear in collective matching.</p>
                   <form
                     onSubmit={saveBuyer}
-                    onChange={() => FE("")}
+                    onChange={() => setFormError("")}
                     aria-labelledby="buyer-form-title"
                     aria-describedby={formError ? "form-error" : undefined}
                   >
@@ -638,14 +562,14 @@ export default function App() {
                         placeholder="e.g. Onion"
                         list="buyer-crops"
                       />
-                      <datalist id="buyer-crops">
-                        <option>Onion</option>
-                        <option>Tomato</option>
-                        <option>Wheat</option>
-                        <option>Potato</option>
-                        <option>Grapes</option>
-                      </datalist>
                     </label>
+                    <datalist id="buyer-crops">
+                      <option>Onion</option>
+                      <option>Tomato</option>
+                      <option>Wheat</option>
+                      <option>Potato</option>
+                      <option>Grapes</option>
+                    </datalist>
                     <label htmlFor="buyer-quantity">
                       Quantity required (kg)
                       <input
@@ -755,7 +679,7 @@ export default function App() {
                     id="matching-crop"
                     aria-describedby="matching-filter-help"
                     value={crop}
-                    onChange={(e) => C(e.target.value)}
+                    onChange={(e) => setCrop(e.target.value)}
                   >
                     {crops.map((x) => (
                       <option key={x}>{x}</option>
@@ -772,7 +696,7 @@ export default function App() {
                     step="1"
                     value={target}
                     onChange={(e) =>
-                      T(Math.max(1, Number(e.target.value) || 1))
+                      setTarget(Math.max(1, Number(e.target.value) || 1))
                     }
                   />
                 </label>
@@ -782,7 +706,7 @@ export default function App() {
                     id="matching-region"
                     aria-describedby="matching-filter-help"
                     value={region}
-                    onChange={(e) => G(e.target.value)}
+                    onChange={(e) => setRegion(e.target.value)}
                   >
                     {[
                       "All regions",
@@ -947,7 +871,7 @@ export default function App() {
                           step={k === "qty" ? "1" : "0.01"}
                           value={calc[k]}
                           onChange={(e) =>
-                            Q({
+                            setCalculator({
                               ...calc,
                               [k]: Math.max(0, Number(e.target.value) || 0),
                             })
@@ -1026,7 +950,7 @@ export default function App() {
                       id="assistant-question"
                       aria-label="Ask CropSolution AI a question"
                       value={question}
-                      onChange={(e) => U(e.target.value)}
+                      onChange={(e) => setQuestion(e.target.value)}
                       placeholder="Ask about your harvest or earnings..."
                     />
                     <button className="primary">Send ↑</button>
@@ -1043,7 +967,7 @@ export default function App() {
                     "What is my estimated net earning?",
                     "Are these buyer listings confirmed?",
                   ].map((q) => (
-                    <button className="suggestion" key={q} onClick={() => U(q)}>
+                    <button className="suggestion" key={q} onClick={() => setQuestion(q)}>
                       “{q}” →
                     </button>
                   ))}

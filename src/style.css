@@ -1,6 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap");
 :root {
-  font-family: "DM Sans", sans-serif;
+  font-family: "Segoe UI", system-ui, sans-serif;
   color: #263b30;
   background: #f5f7f3;
   --green: #174a38;
@@ -37,7 +36,7 @@ button {
 }
 .brand {
   font:
-    800 16px Manrope,
+    800 16px system-ui,
     sans-serif;
   color: #234936;
 }
@@ -53,11 +52,11 @@ button {
 }
 .brand span,
 .mobilebrand span {
-  color: #829956;
+  color: #5e743f;
 }
 .side-label {
   margin: 43px 7px 12px;
-  color: #a0aaa2;
+  color: #5d6e63;
   font-size: 9px;
   letter-spacing: 1px;
   font-weight: bold;
@@ -74,7 +73,7 @@ button {
   border: 0;
   border-radius: 8px;
   background: white;
-  color: #718078;
+  color: #5d6e63;
   text-align: left;
   font-size: 11px;
   font-weight: 600;
@@ -101,7 +100,7 @@ button {
 .season small {
   display: block;
   margin-top: 5px;
-  color: #929c87;
+  color: #5d6e63;
   font-size: 9px;
 }
 main {
@@ -121,7 +120,7 @@ header {
   backdrop-filter: blur(8px);
 }
 .crumb {
-  color: #9aa49c;
+  color: #5d6e63;
   font-size: 10px;
 }
 .crumb b {
@@ -133,7 +132,7 @@ header {
   border: 1px solid #e3e9db;
   border-radius: 18px;
   background: #f6f8f1;
-  color: #718357;
+  color: #586d3e;
   font-size: 9px;
   white-space: nowrap;
 }
@@ -163,7 +162,7 @@ header {
   z-index: 1;
   margin: 15px 0 7px;
   font:
-    800 28px/1.2 Manrope,
+    800 28px/1.2 system-ui,
     sans-serif;
   letter-spacing: -1px;
 }
@@ -187,6 +186,59 @@ header {
   font-size: 75px;
   line-height: 1.2;
   opacity: 0.4;
+}
+.workflow {
+  margin: -10px 0 28px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: white;
+}
+.workflow-heading h2 {
+  margin: 5px 0;
+  color: #2a4033;
+  font: 700 15px system-ui, sans-serif;
+}
+.workflow-heading p {
+  max-width: 720px;
+  margin: 5px 0 13px;
+  color: #5d6e63;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.workflow-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.workflow-step {
+  display: grid;
+  justify-items: start;
+  gap: 5px;
+  min-height: 94px;
+  padding: 11px;
+  border: 1px solid #e8eee7;
+  border-radius: 8px;
+  background: #fbfcfa;
+  color: #405548;
+  text-align: left;
+}
+.workflow-step:hover {
+  border-color: #b8cdb6;
+  background: #f4f8f2;
+}
+.workflow-step span {
+  color: #4d6e4a;
+  font-size: 8px;
+  font-weight: 700;
+}
+.workflow-step b {
+  font-size: 10px;
+}
+.workflow-step small {
+  color: #5d6e63;
+  font-size: 8px;
+  line-height: 1.4;
 }
 .light,
 .primary,
@@ -214,7 +266,7 @@ header {
   font-size: 10px;
 }
 .eyebrow {
-  color: #92a174;
+  color: #596841;
   font-size: 9px;
   letter-spacing: 1.2px;
   font-weight: 700;
@@ -230,12 +282,12 @@ header {
   margin: 4px 0;
   color: #2a4033;
   font:
-    800 21px Manrope,
+    800 21px system-ui,
     sans-serif;
 }
 .title p {
   margin: 4px 0 0;
-  color: #8c978f;
+  color: #5d6e63;
   font-size: 10px;
 }
 .primary {
@@ -269,17 +321,17 @@ header {
   height: 31px;
   border-radius: 9px;
   background: #edf3e9;
-  color: #60835d;
+  color: #4d6e4a;
   font-style: normal;
 }
 .stats small {
-  color: #929d94;
+  color: #5d6e63;
   font-size: 8px;
 }
 .stats b {
   color: #405548;
   font:
-    800 16px Manrope,
+    800 16px system-ui,
     sans-serif;
 }
 .two {
@@ -298,13 +350,13 @@ header {
   margin: 0;
   color: #3b5143;
   font:
-    700 13px Manrope,
+    700 13px system-ui,
     sans-serif;
 }
 .panel p,
 .panelhead p,
 .formpanel > p {
-  color: #929d94;
+  color: #5d6e63;
   font-size: 9px;
 }
 .panelhead {
@@ -336,7 +388,7 @@ table {
 th {
   padding: 8px;
   border-bottom: 1px solid #edf0eb;
-  color: #a1aaa3;
+  color: #5d6e63;
   font-size: 7px;
   letter-spacing: 0.5px;
   white-space: nowrap;
@@ -351,14 +403,14 @@ td {
 td small {
   display: block;
   margin-top: 3px;
-  color: #9ea89f;
+  color: #5d6e63;
   font-size: 8px;
 }
 .chip {
   padding: 4px 7px;
   border-radius: 12px;
   background: #edf4eb;
-  color: #64815d;
+  color: #4d6e4a;
 }
 .next {
   background: #fafbf7;
@@ -383,7 +435,7 @@ td small {
 .next > small {
   display: block;
   margin-top: 10px;
-  color: #a0aaa2;
+  color: #5d6e63;
   font-size: 8px;
 }
 .harvestlayout {
@@ -432,7 +484,7 @@ td small {
 }
 .formpanel form > small,
 .hint {
-  color: #9ba59c;
+  color: #5d6e63;
   font-size: 8px;
   line-height: 1.5;
 }
@@ -443,7 +495,7 @@ td small {
   border: 0;
   border-radius: 5px;
   background: #fbf0eb;
-  color: #a87b6e;
+  color: #865d51;
 }
 .filters {
   display: grid;
@@ -464,9 +516,9 @@ td small {
   padding: 4px 6px;
   border-radius: 4px;
   background: #f5f3e9;
-  color: #948e5e;
+  color: #726d43;
   font:
-    700 7px "DM Sans",
+    700 7px system-ui,
     sans-serif;
 }
 .ready,
@@ -479,11 +531,11 @@ td small {
 }
 .ready {
   background: #edf5e9;
-  color: #5b8058;
+  color: #4f6d4b;
 }
 .short {
   background: #fbf3e6;
-  color: #ad8753;
+  color: #795d34;
 }
 .metrics {
   display: grid;
@@ -492,7 +544,7 @@ td small {
   padding: 13px 0;
 }
 .metrics span {
-  color: #97a198;
+  color: #5d6e63;
   font-size: 8px;
 }
 .metrics b {
@@ -500,7 +552,7 @@ td small {
   margin-top: 5px;
   color: #45594a;
   font:
-    800 14px Manrope,
+    800 14px system-ui,
     sans-serif;
 }
 .bar {
@@ -536,7 +588,7 @@ td small {
   font-size: 8px;
 }
 .contributors small {
-  color: #9ba59c;
+  color: #5d6e63;
   font-size: 8px;
 }
 .contributors strong {
@@ -566,7 +618,7 @@ td small {
   border-block: 1px solid #eff1ed;
 }
 .facts span {
-  color: #9ca69e;
+  color: #5d6e63;
   font-size: 8px;
 }
 .facts b {
@@ -576,7 +628,7 @@ td small {
   font-size: 9px;
 }
 .buyers article > small {
-  color: #a2a98e;
+  color: #606b47;
   font-size: 8px;
 }
 .empty {
@@ -601,7 +653,7 @@ td small {
 }
 .summary > strong {
   font:
-    800 29px Manrope,
+    800 29px system-ui,
     sans-serif;
 }
 .summary > strong + small {
@@ -638,7 +690,7 @@ td small {
   position: absolute;
   right: 8px;
   bottom: 12px;
-  color: #9aa49c;
+  color: #5d6e63;
   font-size: 8px;
 }
 .calcgrid input {
@@ -652,11 +704,11 @@ td small {
   border: 1px solid #e8ecdf;
   background: #fafbf6;
   border-radius: 9px;
-  color: #9b9a64;
+  color: #6a6a3c;
   font-size: 14px;
 }
 .tip span {
-  color: #8e9a91;
+  color: #5d6e63;
   font-size: 9px;
   line-height: 1.5;
 }
@@ -668,7 +720,7 @@ td small {
   background: #fafbf8;
   border: 1px solid #edf0eb;
   border-radius: 8px;
-  color: #718075;
+  color: #5d6e63;
   font-size: 10px;
   line-height: 1.6;
 }
@@ -685,7 +737,7 @@ td small {
 .chat > small {
   display: block;
   margin-top: 8px;
-  color: #9ca79d;
+  color: #5d6e63;
   font-size: 8px;
 }
 .suggestion {
@@ -726,7 +778,7 @@ footer {
   margin-top: 23px;
   padding-top: 12px;
   border-top: 1px solid var(--line);
-  color: #9ba69d;
+  color: #5d6e63;
   font-size: 8px;
 }
 .mobilebrand {
@@ -742,6 +794,9 @@ footer {
   .harvestlayout,
   .two {
     grid-template-columns: 1fr;
+  }
+  .workflow-steps {
+    grid-template-columns: 1fr 1fr;
   }
 }
 @media (max-width: 620px) {
@@ -786,7 +841,7 @@ footer {
     display: block;
     color: #234936;
     font:
-      800 11px Manrope,
+      800 11px system-ui,
       sans-serif;
   }
   .crumb {
@@ -845,7 +900,8 @@ footer {
     padding: 12px;
   }
   .filters,
-  .calcgrid {
+  .calcgrid,
+  .workflow-steps {
     grid-template-columns: 1fr;
   }
   .metrics {
@@ -889,7 +945,7 @@ footer {
 }
 .buyerrow p {
   margin: 0;
-  color: #8f9a91;
+  color: #5d6e63;
   font-size: 9px;
 }
 .buyerrow .remove {
